@@ -29,4 +29,42 @@ public class ChatHandler {
         out = new DataOutputStream(socket.getOutputStream());
         handlers.add(this);
     }
+    
+    public void start()
+    {
+        String name ="";
+        try 
+        {
+            name = in.readUTF();
+            System.out.println(
+                "New Client " + name + " from " + socket.getInetAddress());
+            broadcast(name + " entered");
+            while (true)
+                broadcast(name + ": " + in.readUTF());
+        } 
+        catch (IOException e)
+        {
+            System.out.println("-- Connection to user lost.");
+        }
+        finally 
+        {
+            handlers.remove(this);
+            try
+            {
+                in.close();
+                out.close();
+                socket.close();
+            }
+            catch (IOException e) {}
+        }    
+    }
+    
+    static synchronized void broadcast(String message) throws IOException
+    {
+        for (ChatHandler handler : handlers)
+        {
+            handler.out.writeUTF(message);
+            handler.out.flush();
+        }
+    }
 }
