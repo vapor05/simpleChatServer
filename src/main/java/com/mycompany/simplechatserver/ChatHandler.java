@@ -16,7 +16,7 @@ import java.util.Set;
  *
  * @author NicholasBocchini
  */
-public class ChatHandler {
+public class ChatHandler extends Thread{
     Socket socket;
     DataInputStream in;
     DataOutputStream out;
@@ -30,7 +30,7 @@ public class ChatHandler {
         handlers.add(this);
     }
     
-    public void start()
+    public void run()
     {
         String name ="";
         try 
@@ -51,6 +51,7 @@ public class ChatHandler {
             handlers.remove(this);
             try
             {
+                broadcast(name + " left");
                 in.close();
                 out.close();
                 socket.close();
